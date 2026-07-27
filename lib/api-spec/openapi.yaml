@@ -3,20 +3,25 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Andy Homecare Connect API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User profiles (employers and housekeepers)
+  - name: payments
+    description: Mpesa registration payment tracking
+  - name: stats
+    description: Platform statistics
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +29,391 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all registered user profiles
+      parameters:
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [employer, housekeeper]
+          required: false
+          description: Filter by role
+        - in: query
+          name: county
+          schema:
+            type: string
+          required: false
+          description: Filter by county/location
+        - in: query
+          name: minSalary
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: maxSalary
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: skill
+          schema:
+            type: string
+          required: false
+          description: Filter by skill
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user profile by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update a user profile
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/featured:
+    get:
+      operationId: getFeaturedUsers
+      tags: [users]
+      summary: Get recently joined / featured profiles
+      parameters:
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [employer, housekeeper]
+          required: false
+      responses:
+        "200":
+          description: Featured user profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /payments:
+    get:
+      operationId: listPayments
+      tags: [payments]
+      summary: List all payments (admin)
+      responses:
+        "200":
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+    post:
+      operationId: createPayment
+      tags: [payments]
+      summary: Submit Mpesa payment reference for verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentInput"
+      responses:
+        "201":
+          description: Payment recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payments/{userId}:
+    get:
+      operationId: getUserPayment
+      tags: [payments]
+      summary: Get payment status for a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payment record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          description: No payment found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /stats:
+    get:
+      operationId: getPlatformStats
+      tags: [stats]
+      summary: Get platform-wide statistics
+      responses:
+        "200":
+          description: Platform stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    User:
+      type: object
+      required: [id, fullName, role, county, phone, salaryExpectation, registeredAt, paymentVerified]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [employer, housekeeper]
+        county:
+          type: string
+        phone:
+          type: string
+        email:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        salaryExpectation:
+          type: integer
+          description: Monthly salary expectation in KES
+        skills:
+          type: ["string", "null"]
+          description: Comma-separated skills (for housekeepers)
+        experience:
+          type: ["string", "null"]
+          description: Years of experience description
+        languages:
+          type: ["string", "null"]
+        availability:
+          type: ["string", "null"]
+          description: Immediate, 2 weeks notice, etc.
+        paymentVerified:
+          type: boolean
+        registeredAt:
+          type: string
+          format: date-time
+
+    UserInput:
+      type: object
+      required: [fullName, role, county, phone, salaryExpectation]
+      properties:
+        fullName:
+          type: string
+          minLength: 2
+        role:
+          type: string
+          enum: [employer, housekeeper]
+        county:
+          type: string
+          minLength: 2
+        phone:
+          type: string
+          minLength: 10
+        email:
+          type: string
+        bio:
+          type: string
+        photoUrl:
+          type: string
+        salaryExpectation:
+          type: integer
+          minimum: 1
+        skills:
+          type: string
+        experience:
+          type: string
+        languages:
+          type: string
+        availability:
+          type: string
+
+    UserUpdate:
+      type: object
+      properties:
+        fullName:
+          type: string
+          minLength: 2
+        county:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        bio:
+          type: string
+        photoUrl:
+          type: string
+        salaryExpectation:
+          type: integer
+          minimum: 1
+        skills:
+          type: string
+        experience:
+          type: string
+        languages:
+          type: string
+        availability:
+          type: string
+
+    Payment:
+      type: object
+      required: [id, userId, mpesaCode, amount, status, submittedAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        mpesaCode:
+          type: string
+          description: Mpesa transaction code
+        amount:
+          type: integer
+          description: Amount paid in KES
+        status:
+          type: string
+          enum: [pending, verified, rejected]
+        submittedAt:
+          type: string
+          format: date-time
+
+    PaymentInput:
+      type: object
+      required: [userId, mpesaCode, amount]
+      properties:
+        userId:
+          type: integer
+        mpesaCode:
+          type: string
+          minLength: 5
+        amount:
+          type: integer
+          minimum: 250
+
+    PlatformStats:
+      type: object
+      required: [totalHousekeepers, totalEmployers, verifiedHousekeepers, verifiedEmployers, countiesCovered]
+      properties:
+        totalHousekeepers:
+          type: integer
+        totalEmployers:
+          type: integer
+        verifiedHousekeepers:
+          type: integer
+        verifiedEmployers:
+          type: integer
+        countiesCovered:
+          type: integer
