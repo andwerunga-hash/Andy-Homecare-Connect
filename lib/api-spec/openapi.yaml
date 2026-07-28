@@ -16,6 +16,8 @@ tags:
     description: Mpesa registration payment tracking
   - name: stats
     description: Platform statistics
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
@@ -42,13 +44,11 @@ paths:
             type: string
             enum: [employer, housekeeper]
           required: false
-          description: Filter by role
         - in: query
           name: county
           schema:
             type: string
           required: false
-          description: Filter by county/location
         - in: query
           name: minSalary
           schema:
@@ -64,7 +64,6 @@ paths:
           schema:
             type: string
           required: false
-          description: Filter by skill
       responses:
         "200":
           description: List of users
@@ -178,7 +177,7 @@ paths:
     get:
       operationId: listPayments
       tags: [payments]
-      summary: List all payments (admin)
+      summary: List all payments
       responses:
         "200":
           description: List of payments
@@ -250,6 +249,107 @@ paths:
               schema:
                 $ref: "#/components/schemas/PlatformStats"
 
+  /admin/dashboard:
+    get:
+      operationId: getAdminDashboard
+      tags: [admin]
+      summary: Get all users with their payment info for admin review
+      parameters:
+        - in: query
+          name: adminPin
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of users with payment info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserWithPayment"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/approve/{userId}:
+    post:
+      operationId: adminApproveUser
+      tags: [admin]
+      summary: Approve a user profile after verifying payment
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminActionInput"
+      responses:
+        "200":
+          description: User approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/reject/{userId}:
+    post:
+      operationId: adminRejectUser
+      tags: [admin]
+      summary: Reject a user profile / payment
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminActionInput"
+      responses:
+        "200":
+          description: User rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -289,23 +389,66 @@ components:
           type: ["string", "null"]
         salaryExpectation:
           type: integer
-          description: Monthly salary expectation in KES
         skills:
           type: ["string", "null"]
-          description: Comma-separated skills (for housekeepers)
         experience:
           type: ["string", "null"]
-          description: Years of experience description
         languages:
           type: ["string", "null"]
         availability:
           type: ["string", "null"]
-          description: Immediate, 2 weeks notice, etc.
         paymentVerified:
           type: boolean
         registeredAt:
           type: string
           format: date-time
+
+    UserWithPayment:
+      type: object
+      required: [id, fullName, role, county, phone, salaryExpectation, registeredAt, paymentVerified]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [employer, housekeeper]
+        county:
+          type: string
+        phone:
+          type: string
+        email:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        salaryExpectation:
+          type: integer
+        skills:
+          type: ["string", "null"]
+        experience:
+          type: ["string", "null"]
+        languages:
+          type: ["string", "null"]
+        availability:
+          type: ["string", "null"]
+        paymentVerified:
+          type: boolean
+        registeredAt:
+          type: string
+          format: date-time
+        paymentId:
+          type: ["integer", "null"]
+        mpesaCode:
+          type: ["string", "null"]
+        paymentAmount:
+          type: ["integer", "null"]
+        paymentStatus:
+          type: ["string", "null"]
+        paymentSubmittedAt:
+          type: ["string", "null"]
 
     UserInput:
       type: object
@@ -379,10 +522,8 @@ components:
           type: integer
         mpesaCode:
           type: string
-          description: Mpesa transaction code
         amount:
           type: integer
-          description: Amount paid in KES
         status:
           type: string
           enum: [pending, verified, rejected]
@@ -402,6 +543,14 @@ components:
         amount:
           type: integer
           minimum: 250
+
+    AdminActionInput:
+      type: object
+      required: [adminPin]
+      properties:
+        adminPin:
+          type: string
+          minLength: 4
 
     PlatformStats:
       type: object

@@ -8,18 +8,9 @@
 import type { ListUsersRole } from './listUsersRole';
 
 export type ListUsersParams = {
-/**
- * Filter by role
- */
 role?: ListUsersRole;
-/**
- * Filter by county/location
- */
 county?: string;
 minSalary?: number;
 maxSalary?: number;
-/**
- * Filter by skill
- */
 skill?: string;
 };

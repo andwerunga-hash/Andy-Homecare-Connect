@@ -20,7 +20,9 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminActionInput,
   ErrorResponse,
+  GetAdminDashboardParams,
   GetFeaturedUsersParams,
   HealthStatus,
   ListUsersParams,
@@ -29,7 +31,8 @@ import type {
   PlatformStats,
   User,
   UserInput,
-  UserUpdate
+  UserUpdate,
+  UserWithPayment
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -533,7 +536,7 @@ export const getListPaymentsUrl = () => {
 }
 
 /**
- * @summary List all payments (admin)
+ * @summary List all payments
  */
 export const listPayments = async ( options?: RequestInit): Promise<Payment[]> => {
 
@@ -580,7 +583,7 @@ export type ListPaymentsQueryError = ErrorType<unknown>
 
 
 /**
- * @summary List all payments (admin)
+ * @summary List all payments
  */
 
 export function useListPayments<TData = Awaited<ReturnType<typeof listPayments>>, TError = ErrorType<unknown>>(
@@ -825,4 +828,232 @@ export function useGetPlatformStats<TData = Awaited<ReturnType<typeof getPlatfor
 
 
 
+
+export const getGetAdminDashboardUrl = (params: GetAdminDashboardParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/dashboard?${stringifiedParams}` : `/api/admin/dashboard`
+}
+
+/**
+ * @summary Get all users with their payment info for admin review
+ */
+export const getAdminDashboard = async (params: GetAdminDashboardParams, options?: RequestInit): Promise<UserWithPayment[]> => {
+
+  return customFetch<UserWithPayment[]>(getGetAdminDashboardUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminDashboardQueryKey = (params?: GetAdminDashboardParams,) => {
+    return [
+    `/api/admin/dashboard`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAdminDashboardQueryOptions = <TData = Awaited<ReturnType<typeof getAdminDashboard>>, TError = ErrorType<ErrorResponse>>(params: GetAdminDashboardParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminDashboard>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminDashboardQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminDashboard>>> = ({ signal }) => getAdminDashboard(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminDashboard>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminDashboardQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminDashboard>>>
+export type GetAdminDashboardQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get all users with their payment info for admin review
+ */
+
+export function useGetAdminDashboard<TData = Awaited<ReturnType<typeof getAdminDashboard>>, TError = ErrorType<ErrorResponse>>(
+ params: GetAdminDashboardParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminDashboard>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminDashboardQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAdminApproveUserUrl = (userId: number,) => {
+
+
+
+
+  return `/api/admin/approve/${userId}`
+}
+
+/**
+ * @summary Approve a user profile after verifying payment
+ */
+export const adminApproveUser = async (userId: number,
+    adminActionInput: AdminActionInput, options?: RequestInit): Promise<User> => {
+
+  return customFetch<User>(getAdminApproveUserUrl(userId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adminActionInput)
+  }
+);}
+
+
+
+
+
+export const getAdminApproveUserMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminApproveUser>>, TError,{userId: number;data: BodyType<AdminActionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminApproveUser>>, TError,{userId: number;data: BodyType<AdminActionInput>}, TContext> => {
+
+const mutationKey = ['adminApproveUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminApproveUser>>, {userId: number;data: BodyType<AdminActionInput>}> = (props) => {
+          const {userId,data} = props ?? {};
+
+          return  adminApproveUser(userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminApproveUserMutationResult = NonNullable<Awaited<ReturnType<typeof adminApproveUser>>>
+    export type AdminApproveUserMutationBody = BodyType<AdminActionInput>
+    export type AdminApproveUserMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Approve a user profile after verifying payment
+ */
+export const useAdminApproveUser = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminApproveUser>>, TError,{userId: number;data: BodyType<AdminActionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminApproveUser>>,
+        TError,
+        {userId: number;data: BodyType<AdminActionInput>},
+        TContext
+      > => {
+      return useMutation(getAdminApproveUserMutationOptions(options));
+    }
+
+export const getAdminRejectUserUrl = (userId: number,) => {
+
+
+
+
+  return `/api/admin/reject/${userId}`
+}
+
+/**
+ * @summary Reject a user profile / payment
+ */
+export const adminRejectUser = async (userId: number,
+    adminActionInput: AdminActionInput, options?: RequestInit): Promise<User> => {
+
+  return customFetch<User>(getAdminRejectUserUrl(userId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adminActionInput)
+  }
+);}
+
+
+
+
+
+export const getAdminRejectUserMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRejectUser>>, TError,{userId: number;data: BodyType<AdminActionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminRejectUser>>, TError,{userId: number;data: BodyType<AdminActionInput>}, TContext> => {
+
+const mutationKey = ['adminRejectUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminRejectUser>>, {userId: number;data: BodyType<AdminActionInput>}> = (props) => {
+          const {userId,data} = props ?? {};
+
+          return  adminRejectUser(userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminRejectUserMutationResult = NonNullable<Awaited<ReturnType<typeof adminRejectUser>>>
+    export type AdminRejectUserMutationBody = BodyType<AdminActionInput>
+    export type AdminRejectUserMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Reject a user profile / payment
+ */
+export const useAdminRejectUser = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRejectUser>>, TError,{userId: number;data: BodyType<AdminActionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminRejectUser>>,
+        TError,
+        {userId: number;data: BodyType<AdminActionInput>},
+        TContext
+      > => {
+      return useMutation(getAdminRejectUserMutationOptions(options));
+    }
 

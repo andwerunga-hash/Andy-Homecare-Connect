@@ -6,7 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './adminActionInput';
 export * from './errorResponse';
+export * from './getAdminDashboardParams';
 export * from './getFeaturedUsersParams';
 export * from './getFeaturedUsersRole';
 export * from './healthStatus';
@@ -21,3 +23,5 @@ export * from './userInput';
 export * from './userInputRole';
 export * from './userRole';
 export * from './userUpdate';
+export * from './userWithPayment';
+export * from './userWithPaymentRole';

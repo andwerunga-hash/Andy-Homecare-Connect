@@ -33,27 +33,60 @@ export interface User {
   bio?: string | null;
   /** @nullable */
   photoUrl?: string | null;
-  /** Monthly salary expectation in KES */
   salaryExpectation: number;
-  /**
-     * Comma-separated skills (for housekeepers)
-     * @nullable
-     */
+  /** @nullable */
   skills?: string | null;
-  /**
-     * Years of experience description
-     * @nullable
-     */
+  /** @nullable */
   experience?: string | null;
   /** @nullable */
   languages?: string | null;
-  /**
-     * Immediate, 2 weeks notice, etc.
-     * @nullable
-     */
+  /** @nullable */
   availability?: string | null;
   paymentVerified: boolean;
   registeredAt: string;
+}
+
+export type UserWithPaymentRole = typeof UserWithPaymentRole[keyof typeof UserWithPaymentRole];
+
+
+export const UserWithPaymentRole = {
+  employer: 'employer',
+  housekeeper: 'housekeeper',
+} as const;
+
+export interface UserWithPayment {
+  id: number;
+  fullName: string;
+  role: UserWithPaymentRole;
+  county: string;
+  phone: string;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  bio?: string | null;
+  /** @nullable */
+  photoUrl?: string | null;
+  salaryExpectation: number;
+  /** @nullable */
+  skills?: string | null;
+  /** @nullable */
+  experience?: string | null;
+  /** @nullable */
+  languages?: string | null;
+  /** @nullable */
+  availability?: string | null;
+  paymentVerified: boolean;
+  registeredAt: string;
+  /** @nullable */
+  paymentId?: number | null;
+  /** @nullable */
+  mpesaCode?: string | null;
+  /** @nullable */
+  paymentAmount?: number | null;
+  /** @nullable */
+  paymentStatus?: string | null;
+  /** @nullable */
+  paymentSubmittedAt?: string | null;
 }
 
 export type UserInputRole = typeof UserInputRole[keyof typeof UserInputRole];
@@ -111,9 +144,7 @@ export const PaymentStatus = {
 export interface Payment {
   id: number;
   userId: number;
-  /** Mpesa transaction code */
   mpesaCode: string;
-  /** Amount paid in KES */
   amount: number;
   status: PaymentStatus;
   submittedAt: string;
@@ -127,6 +158,11 @@ export interface PaymentInput {
   amount: number;
 }
 
+export interface AdminActionInput {
+  /** @minLength 4 */
+  adminPin: string;
+}
+
 export interface PlatformStats {
   totalHousekeepers: number;
   totalEmployers: number;
@@ -136,19 +172,10 @@ export interface PlatformStats {
 }
 
 export type ListUsersParams = {
-/**
- * Filter by role
- */
 role?: ListUsersRole;
-/**
- * Filter by county/location
- */
 county?: string;
 minSalary?: number;
 maxSalary?: number;
-/**
- * Filter by skill
- */
 skill?: string;
 };
 
@@ -171,4 +198,8 @@ export const GetFeaturedUsersRole = {
   employer: 'employer',
   housekeeper: 'housekeeper',
 } as const;
+
+export type GetAdminDashboardParams = {
+adminPin: string;
+};
 

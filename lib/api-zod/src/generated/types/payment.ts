@@ -10,9 +10,7 @@ import type { PaymentStatus } from './paymentStatus';
 export interface Payment {
   id: number;
   userId: number;
-  /** Mpesa transaction code */
   mpesaCode: string;
-  /** Amount paid in KES */
   amount: number;
   status: PaymentStatus;
   submittedAt: Date;

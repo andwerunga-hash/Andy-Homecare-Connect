@@ -5,12 +5,12 @@
  * Andy Homecare Connect API
  * OpenAPI spec version: 0.1.0
  */
-import type { UserRole } from './userRole';
+import type { UserWithPaymentRole } from './userWithPaymentRole';
 
-export interface User {
+export interface UserWithPayment {
   id: number;
   fullName: string;
-  role: UserRole;
+  role: UserWithPaymentRole;
   county: string;
   phone: string;
   /** @nullable */
@@ -30,4 +30,14 @@ export interface User {
   availability?: string | null;
   paymentVerified: boolean;
   registeredAt: Date;
+  /** @nullable */
+  paymentId?: number | null;
+  /** @nullable */
+  mpesaCode?: string | null;
+  /** @nullable */
+  paymentAmount?: number | null;
+  /** @nullable */
+  paymentStatus?: string | null;
+  /** @nullable */
+  paymentSubmittedAt?: string | null;
 }

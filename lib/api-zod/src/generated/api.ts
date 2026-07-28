@@ -20,11 +20,11 @@ export const HealthCheckResponse = zod.object({
  * @summary List all registered user profiles
  */
 export const ListUsersQueryParams = zod.object({
-  "role": zod.enum(['employer', 'housekeeper']).optional().describe('Filter by role'),
-  "county": zod.coerce.string().optional().describe('Filter by county\/location'),
+  "role": zod.enum(['employer', 'housekeeper']).optional(),
+  "county": zod.coerce.string().optional(),
   "minSalary": zod.coerce.number().optional(),
   "maxSalary": zod.coerce.number().optional(),
-  "skill": zod.coerce.string().optional().describe('Filter by skill')
+  "skill": zod.coerce.string().optional()
 })
 
 export const ListUsersResponseItem = zod.object({
@@ -36,11 +36,11 @@ export const ListUsersResponseItem = zod.object({
   "email": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "photoUrl": zod.string().nullish(),
-  "salaryExpectation": zod.number().describe('Monthly salary expectation in KES'),
-  "skills": zod.string().nullish().describe('Comma-separated skills (for housekeepers)'),
-  "experience": zod.string().nullish().describe('Years of experience description'),
+  "salaryExpectation": zod.number(),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
   "languages": zod.string().nullish(),
-  "availability": zod.string().nullish().describe('Immediate, 2 weeks notice, etc.'),
+  "availability": zod.string().nullish(),
   "paymentVerified": zod.boolean(),
   "registeredAt": zod.coerce.date()
 })
@@ -83,11 +83,11 @@ export const CreateUserResponse = zod.object({
   "email": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "photoUrl": zod.string().nullish(),
-  "salaryExpectation": zod.number().describe('Monthly salary expectation in KES'),
-  "skills": zod.string().nullish().describe('Comma-separated skills (for housekeepers)'),
-  "experience": zod.string().nullish().describe('Years of experience description'),
+  "salaryExpectation": zod.number(),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
   "languages": zod.string().nullish(),
-  "availability": zod.string().nullish().describe('Immediate, 2 weeks notice, etc.'),
+  "availability": zod.string().nullish(),
   "paymentVerified": zod.boolean(),
   "registeredAt": zod.coerce.date()
 })
@@ -109,11 +109,11 @@ export const GetUserResponse = zod.object({
   "email": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "photoUrl": zod.string().nullish(),
-  "salaryExpectation": zod.number().describe('Monthly salary expectation in KES'),
-  "skills": zod.string().nullish().describe('Comma-separated skills (for housekeepers)'),
-  "experience": zod.string().nullish().describe('Years of experience description'),
+  "salaryExpectation": zod.number(),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
   "languages": zod.string().nullish(),
-  "availability": zod.string().nullish().describe('Immediate, 2 weeks notice, etc.'),
+  "availability": zod.string().nullish(),
   "paymentVerified": zod.boolean(),
   "registeredAt": zod.coerce.date()
 })
@@ -154,11 +154,11 @@ export const UpdateUserResponse = zod.object({
   "email": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "photoUrl": zod.string().nullish(),
-  "salaryExpectation": zod.number().describe('Monthly salary expectation in KES'),
-  "skills": zod.string().nullish().describe('Comma-separated skills (for housekeepers)'),
-  "experience": zod.string().nullish().describe('Years of experience description'),
+  "salaryExpectation": zod.number(),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
   "languages": zod.string().nullish(),
-  "availability": zod.string().nullish().describe('Immediate, 2 weeks notice, etc.'),
+  "availability": zod.string().nullish(),
   "paymentVerified": zod.boolean(),
   "registeredAt": zod.coerce.date()
 })
@@ -180,11 +180,11 @@ export const GetFeaturedUsersResponseItem = zod.object({
   "email": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "photoUrl": zod.string().nullish(),
-  "salaryExpectation": zod.number().describe('Monthly salary expectation in KES'),
-  "skills": zod.string().nullish().describe('Comma-separated skills (for housekeepers)'),
-  "experience": zod.string().nullish().describe('Years of experience description'),
+  "salaryExpectation": zod.number(),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
   "languages": zod.string().nullish(),
-  "availability": zod.string().nullish().describe('Immediate, 2 weeks notice, etc.'),
+  "availability": zod.string().nullish(),
   "paymentVerified": zod.boolean(),
   "registeredAt": zod.coerce.date()
 })
@@ -192,13 +192,13 @@ export const GetFeaturedUsersResponse = zod.array(GetFeaturedUsersResponseItem)
 
 
 /**
- * @summary List all payments (admin)
+ * @summary List all payments
  */
 export const ListPaymentsResponseItem = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
-  "mpesaCode": zod.string().describe('Mpesa transaction code'),
-  "amount": zod.number().describe('Amount paid in KES'),
+  "mpesaCode": zod.string(),
+  "amount": zod.number(),
   "status": zod.enum(['pending', 'verified', 'rejected']),
   "submittedAt": zod.coerce.date()
 })
@@ -223,8 +223,8 @@ export const CreatePaymentBody = zod.object({
 export const CreatePaymentResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
-  "mpesaCode": zod.string().describe('Mpesa transaction code'),
-  "amount": zod.number().describe('Amount paid in KES'),
+  "mpesaCode": zod.string(),
+  "amount": zod.number(),
   "status": zod.enum(['pending', 'verified', 'rejected']),
   "submittedAt": zod.coerce.date()
 })
@@ -240,8 +240,8 @@ export const GetUserPaymentParams = zod.object({
 export const GetUserPaymentResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
-  "mpesaCode": zod.string().describe('Mpesa transaction code'),
-  "amount": zod.number().describe('Amount paid in KES'),
+  "mpesaCode": zod.string(),
+  "amount": zod.number(),
   "status": zod.enum(['pending', 'verified', 'rejected']),
   "submittedAt": zod.coerce.date()
 })
@@ -256,6 +256,106 @@ export const GetPlatformStatsResponse = zod.object({
   "verifiedHousekeepers": zod.number(),
   "verifiedEmployers": zod.number(),
   "countiesCovered": zod.number()
+})
+
+
+/**
+ * @summary Get all users with their payment info for admin review
+ */
+export const GetAdminDashboardQueryParams = zod.object({
+  "adminPin": zod.coerce.string()
+})
+
+export const GetAdminDashboardResponseItem = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "role": zod.enum(['employer', 'housekeeper']),
+  "county": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "photoUrl": zod.string().nullish(),
+  "salaryExpectation": zod.number(),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
+  "languages": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "paymentVerified": zod.boolean(),
+  "registeredAt": zod.coerce.date(),
+  "paymentId": zod.number().nullish(),
+  "mpesaCode": zod.string().nullish(),
+  "paymentAmount": zod.number().nullish(),
+  "paymentStatus": zod.string().nullish(),
+  "paymentSubmittedAt": zod.string().nullish()
+})
+export const GetAdminDashboardResponse = zod.array(GetAdminDashboardResponseItem)
+
+
+/**
+ * @summary Approve a user profile after verifying payment
+ */
+export const AdminApproveUserParams = zod.object({
+  "userId": zod.coerce.number()
+})
+
+export const adminApproveUserBodyAdminPinMin = 4;
+
+
+
+export const AdminApproveUserBody = zod.object({
+  "adminPin": zod.string().min(adminApproveUserBodyAdminPinMin)
+})
+
+export const AdminApproveUserResponse = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "role": zod.enum(['employer', 'housekeeper']),
+  "county": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "photoUrl": zod.string().nullish(),
+  "salaryExpectation": zod.number(),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
+  "languages": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "paymentVerified": zod.boolean(),
+  "registeredAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Reject a user profile / payment
+ */
+export const AdminRejectUserParams = zod.object({
+  "userId": zod.coerce.number()
+})
+
+export const adminRejectUserBodyAdminPinMin = 4;
+
+
+
+export const AdminRejectUserBody = zod.object({
+  "adminPin": zod.string().min(adminRejectUserBodyAdminPinMin)
+})
+
+export const AdminRejectUserResponse = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "role": zod.enum(['employer', 'housekeeper']),
+  "county": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "photoUrl": zod.string().nullish(),
+  "salaryExpectation": zod.number(),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
+  "languages": zod.string().nullish(),
+  "availability": zod.string().nullish(),
+  "paymentVerified": zod.boolean(),
+  "registeredAt": zod.coerce.date()
 })
 
 
