@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 
 export function Browse() {
   const [searchParams, setSearchParams] = useState({
-    role: "housekeeper" as const,
+    role: "housekeeper" as "housekeeper" | "employer",
     county: "all",
   });
   const [searchTerm, setSearchTerm] = useState("");

@@ -114,10 +114,7 @@ function Dashboard({ adminPin }: { adminPin: string }) {
 
   const { data: users = [], isLoading, isError } = useGetAdminDashboard(
     { adminPin },
-    {
-      retry: false,
-      staleTime: 0,
-    }
+    { query: { queryKey: getGetAdminDashboardQueryKey({ adminPin }), retry: false, staleTime: 0 } }
   );
 
   const approve = useAdminApproveUser({

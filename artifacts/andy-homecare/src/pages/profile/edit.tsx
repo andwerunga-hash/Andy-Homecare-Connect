@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useGetUser, useUpdateUser, getGetUserQueryKey } from "@workspace/api-client-react";
+import { useGetUser, useUpdateUser, getGetUserQueryKey, getGetUserQueryOptions } from "@workspace/api-client-react";
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export function EditProfile() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const { data: user, isLoading } = useGetUser(userId, { query: { enabled: !!userId } });
+  const { data: user, isLoading } = useGetUser(userId, { query: { queryKey: getGetUserQueryKey(userId), enabled: !!userId } });
   const updateUser = useUpdateUser();
   
   const form = useForm<FormValues>({
@@ -301,7 +301,7 @@ export function EditProfile() {
                 <Alert variant="destructive">
                   <AlertTitle>Error</AlertTitle>
                   <AlertDescription>
-                    {updateUser.error?.error || "Failed to update profile. Please try again."}
+                    {updateUser.error?.data?.error || "Failed to update profile. Please try again."}
                   </AlertDescription>
                 </Alert>
               )}

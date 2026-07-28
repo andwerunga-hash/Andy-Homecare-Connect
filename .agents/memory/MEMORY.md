@@ -1,0 +1,3 @@
+- [WhatsApp API integration](whatsapp-api.md) — ErrorType<T> is ApiError<T> with .data for the response body; access errors as error.data?.error not error.error
+- [Admin dashboard pattern](admin-dashboard.md) — PIN in query param for now; admin routes in artifacts/api-server/src/routes/admin.ts; real Meta Phone Number ID still needed
+- [TanStack Query v5 + Orval hooks](tanstack-orval-hooks.md) — always pass queryKey explicitly when overriding query options; use getGet*QueryKey() helpers from @workspace/api-client-react

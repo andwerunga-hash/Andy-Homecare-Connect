@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useCreatePayment, useGetUser, useGetUserPayment } from "@workspace/api-client-react";
+import { useCreatePayment, useGetUser, useGetUserPayment, getGetUserQueryKey, getGetUserPaymentQueryKey } from "@workspace/api-client-react";
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
@@ -24,11 +24,11 @@ export function Payment() {
   
   const [isSuccess, setIsSuccess] = useState(false);
   const createPayment = useCreatePayment();
-  const { data: user } = useGetUser(userId, { query: { enabled: !!userId } });
+  const { data: user } = useGetUser(userId, { query: { queryKey: getGetUserQueryKey(userId), enabled: !!userId } });
   
   // Checking existing payment
   const { data: existingPayment, isLoading: isPaymentLoading } = useGetUserPayment(userId, { 
-    query: { enabled: !!userId && !isSuccess, retry: false } 
+    query: { queryKey: getGetUserPaymentQueryKey(userId), enabled: !!userId && !isSuccess, retry: false } 
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -168,7 +168,7 @@ export function Payment() {
                     <Alert variant="destructive">
                       <AlertTitle>Error</AlertTitle>
                       <AlertDescription>
-                        {createPayment.error?.error || "Failed to submit payment. Please try again."}
+                        {createPayment.error?.data?.error || "Failed to submit payment. Please try again."}
                       </AlertDescription>
                     </Alert>
                   )}
