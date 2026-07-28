@@ -9,6 +9,7 @@ import {
   UpdateUserBody,
   GetFeaturedUsersQueryParams,
 } from "@workspace/api-zod";
+import { notifyAdminNewUser } from "../lib/whatsapp";
 
 const router: IRouter = Router();
 
@@ -79,6 +80,12 @@ router.post("/users", async (req, res): Promise<void> => {
       paymentVerified: false,
     })
     .returning();
+
+  // Notify admin via WhatsApp (fire & forget — never block the response)
+  const adminPhone = process.env.ADMIN_WHATSAPP_NUMBER;
+  if (adminPhone) {
+    notifyAdminNewUser(adminPhone, user.fullName, user.role, user.county).catch(() => {});
+  }
 
   res.status(201).json(user);
 });
