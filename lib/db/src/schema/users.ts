@@ -8,7 +8,9 @@ export const usersTable = pgTable("users", {
   role: text("role").notNull(), // 'employer' | 'housekeeper'
   county: text("county").notNull(),
   phone: text("phone").notNull(),
-  email: text("email"),
+  email: text("email").unique(),
+  passwordHash: text("password_hash"),
+  accountStatus: text("account_status").notNull().default("active"),
   bio: text("bio"),
   photoUrl: text("photo_url"),
   salaryExpectation: integer("salary_expectation").notNull().default(0),
@@ -17,6 +19,7 @@ export const usersTable = pgTable("users", {
   languages: text("languages"),
   availability: text("availability"),
   paymentVerified: boolean("payment_verified").notNull().default(false),
+  verificationStatus: text("verification_status").notNull().default("pending"),
   registeredAt: timestamp("registered_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

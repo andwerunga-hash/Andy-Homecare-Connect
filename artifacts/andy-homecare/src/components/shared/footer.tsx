@@ -76,7 +76,18 @@ export function Footer() {
         
         <div className="pt-8 border-t border-zinc-800 text-sm text-zinc-500 flex flex-col md:flex-row justify-between items-center gap-4">
           <p>© {new Date().getFullYear()} Andy Homecare Connect. All rights reserved.</p>
-          <p className="flex items-center gap-1">Proudly built in Kenya <span className="inline-block w-3 h-3 bg-secondary rounded-full"></span></p>
+          <div className="flex items-center gap-4">
+            <p className="flex items-center gap-1">
+              Proudly built in Kenya
+              <span className="inline-block w-3 h-3 bg-secondary rounded-full"></span>
+            </p>
+            <Link
+              href="/admin/payments"
+              className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors"
+            >
+              Admin
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

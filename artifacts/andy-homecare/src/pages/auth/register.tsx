@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowRight, Loader2, Info } from "lucide-react";
+import { ArrowRight, Loader2, Info, ImageIcon, X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const formSchema = z.object({
@@ -28,6 +28,7 @@ const formSchema = z.object({
   experience: z.string().optional(),
   languages: z.string().optional(),
   availability: z.string().optional(),
+  photoUrl: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -50,10 +51,73 @@ export function Register() {
       experience: "",
       languages: "",
       availability: "",
+      photoUrl: "",
     },
   });
 
   const role = form.watch("role");
+  const photoUrl = form.watch("photoUrl");
+
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      form.setError("photoUrl", {
+        type: "manual",
+        message: "Please select an image file.",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      form.setError("photoUrl", {
+        type: "manual",
+        message: "Photo must be smaller than 5MB.",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const img = new Image();
+
+      img.onload = () => {
+        const maxSize = 900;
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const compressed = canvas.toDataURL("image/jpeg", 0.78);
+
+        form.clearErrors("photoUrl");
+        form.setValue("photoUrl", compressed, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+      };
+
+      img.src = reader.result as string;
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const removePhoto = () => {
+    form.setValue("photoUrl", "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
 
   const onSubmit = (values: FormValues) => {
     createUser.mutate(
@@ -187,6 +251,76 @@ export function Register() {
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="photoUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-6">
+                      <div className="flex flex-col md:flex-row md:items-center gap-5">
+                        <div className="w-24 h-24 rounded-full overflow-hidden bg-muted border-2 border-white shadow flex items-center justify-center flex-shrink-0">
+                          {photoUrl ? (
+                            <img
+                              src={photoUrl}
+                              alt="Profile preview"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <ImageIcon className="w-9 h-9 text-muted-foreground" />
+                          )}
+                        </div>
+
+                        <div className="flex-1">
+                          <FormLabel className="text-base font-bold">
+                            Profile Photo <span className="text-muted-foreground font-normal">(Optional)</span>
+                          </FormLabel>
+
+                          <p className="text-sm text-muted-foreground mt-1 mb-3">
+                            Upload a clear photo of yourself. This helps employers and house helps identify the right person.
+                          </p>
+
+                          <div className="flex flex-wrap gap-2">
+                            <label className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground cursor-pointer hover:opacity-90 transition-opacity">
+                              <ImageIcon className="w-4 h-4 mr-2" />
+                              {photoUrl ? "Change Photo" : "Upload Photo"}
+                              <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                className="hidden"
+                                onChange={handlePhotoChange}
+                              />
+                            </label>
+
+                            {photoUrl && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={removePhoto}
+                              >
+                                <X className="w-4 h-4 mr-1" />
+                                Remove
+                              </Button>
+                            )}
+                          </div>
+
+                          <p className="text-xs text-muted-foreground mt-2">
+                            JPG, PNG or WebP • Maximum 5MB
+                          </p>
+
+                          {form.formState.errors.photoUrl && (
+                            <p className="text-sm text-red-600 mt-2">
+                              {form.formState.errors.photoUrl.message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="grid md:grid-cols-2 gap-6">
                 <FormField
