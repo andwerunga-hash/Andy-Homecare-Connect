@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "corepack pnpm --filter @workspace/api-server run build",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
