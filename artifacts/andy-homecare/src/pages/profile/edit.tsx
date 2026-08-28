@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { KENYA_COUNTIES } from "@/lib/counties";
 import { Link, useLocation, useParams } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,7 +91,7 @@ export function EditProfile() {
     );
   };
 
-  const counties = ["Nairobi", "Mombasa", "Nakuru", "Kiambu", "Machakos", "Kisumu", "Uasin Gishu", "Kajiado"];
+  const counties = KENYA_COUNTIES;
 
   if (isLoading) {
     return (

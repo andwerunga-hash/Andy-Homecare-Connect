@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { KENYA_COUNTIES } from "@/lib/counties";
 import { useListUsers } from "@workspace/api-client-react";
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
@@ -34,7 +35,7 @@ export function Browse() {
   }, [users, searchTerm]);
 
   // Unique counties from data or pre-defined list
-  const counties = ["Nairobi", "Mombasa", "Nakuru", "Kiambu", "Machakos", "Kisumu", "Uasin Gishu", "Kajiado"];
+  const counties = KENYA_COUNTIES;
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-muted/20">
