@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "buildCommand": "BASE_PATH=/ PORT=3000 NODE_ENV=production corepack pnpm --filter @workspace/api-server run build && BASE_PATH=/ PORT=3000 NODE_ENV=production corepack pnpm --filter @workspace/andy-homecare run build",
+  "outputDirectory": "artifacts/andy-homecare/dist/public",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api"
+    }
+  ]
+}
