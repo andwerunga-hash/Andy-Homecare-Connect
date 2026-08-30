@@ -10,12 +10,12 @@ import { Footer } from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { ArrowRight, Loader2, Info, ImageIcon, X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const formSchema = z.object({
   role: z.enum(["employer", "housekeeper"]),
@@ -37,6 +37,8 @@ type FormValues = z.infer<typeof formSchema>;
 export function Register() {
   const [, setLocation] = useLocation();
   const createUser = useCreateUser();
+  const [countyOpen, setCountyOpen] = useState(false);
+  const [countySearch, setCountySearch] = useState("");
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -221,18 +223,51 @@ export function Register() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>County</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-muted/30">
-                            <SelectValue placeholder="Select county" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {counties.map(c => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Popover open={countyOpen} onOpenChange={(open) => { setCountyOpen(open); if (!open) setCountySearch(""); }}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between bg-muted/30 font-normal"
+                            >
+                              {field.value || "Select county"}
+                              <span className="ml-2 opacity-50">⌄</span>
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                          <Input
+                            autoFocus
+                            value={countySearch}
+                            onChange={(e) => setCountySearch(e.target.value)}
+                            placeholder="Type county name..."
+                            className="mb-2 h-11 bg-white"
+                          />
+                          <div className="max-h-60 overflow-y-auto">
+                            {counties
+                              .filter((county) => county.toLowerCase().includes(countySearch.toLowerCase()))
+                              .map((county) => (
+                                <button
+                                  key={county}
+                                  type="button"
+                                  onClick={() => {
+                                    field.onChange(county);
+                                    setCountySearch("");
+                                    setCountyOpen(false);
+                                  }}
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
+                                >
+                                  {county}
+                                </button>
+                              ))}
+                            {counties.filter((county) => county.toLowerCase().includes(countySearch.toLowerCase())).length === 0 && (
+                              <p className="py-3 text-center text-sm text-muted-foreground">No county found.</p>
+                            )}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
