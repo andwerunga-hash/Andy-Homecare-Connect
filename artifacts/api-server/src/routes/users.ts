@@ -70,7 +70,7 @@ router.post("/users", async (req, res): Promise<void> => {
       role: parsed.data.role,
       county: parsed.data.county,
       phone: parsed.data.phone,
-      email: parsed.data.email ?? null,
+      email: parsed.data.email?.trim() || null,
       bio: parsed.data.bio ?? null,
       photoUrl: parsed.data.photoUrl ?? null,
       salaryExpectation: parsed.data.salaryExpectation,
