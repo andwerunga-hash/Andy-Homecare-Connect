@@ -87,7 +87,7 @@ export function Register() {
       const img = new Image();
 
       img.onload = () => {
-        const maxSize = 500;
+        const maxSize = 250;
         const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
 
         const canvas = document.createElement("canvas");
@@ -99,7 +99,7 @@ export function Register() {
 
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        const compressed = canvas.toDataURL("image/jpeg", 0.55);
+        const compressed = canvas.toDataURL("image/jpeg", 0.40);
 
         form.clearErrors("photoUrl");
         form.setValue("photoUrl", compressed, {
