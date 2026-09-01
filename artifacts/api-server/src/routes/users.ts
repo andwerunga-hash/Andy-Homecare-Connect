@@ -56,6 +56,7 @@ router.get("/users", async (req, res): Promise<void> => {
 });
 
 router.post("/users", async (req, res): Promise<void> => {
+  try {
   const parsed = CreateUserBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -88,6 +89,10 @@ router.post("/users", async (req, res): Promise<void> => {
   }
 
   res.status(201).json(user);
+  } catch (error) {
+    console.error("Create user error:", error);
+    res.status(500).json({ error: "Unable to create user." });
+  }
 });
 
 router.get("/users/:id", async (req, res): Promise<void> => {
