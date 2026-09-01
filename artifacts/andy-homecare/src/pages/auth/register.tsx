@@ -459,7 +459,7 @@ export function Register() {
                 <Alert variant="destructive">
                   <AlertTitle>Error</AlertTitle>
                   <AlertDescription>
-                    {createUser.error?.data?.error || "Failed to register. Please try again."}
+                    {createUser.error?.data?.error || createUser.error?.message || JSON.stringify(createUser.error) || "Failed to register. Please try again."}
                   </AlertDescription>
                 </Alert>
               )}
