@@ -98,7 +98,7 @@ export function notifyUserRejected(userPhone: string, userName: string): Promise
   const msg =
     `❌ *Profile Review — Andy Homecare Connect*\n\n` +
     `Dear ${userName}, we were unable to verify your Mpesa payment.\n\n` +
-    `Please ensure you paid Ksh 250 to Paybill 542542, Account 22703, ` +
+    `Please ensure you paid Ksh 100 to Paybill 542542, Account 22703, ` +
     `then submit your correct Mpesa transaction code at andyhomecare.co.ke/payment.\n\n` +
     `For help, please contact our support team.`;
   return sendWhatsApp(userPhone, msg);

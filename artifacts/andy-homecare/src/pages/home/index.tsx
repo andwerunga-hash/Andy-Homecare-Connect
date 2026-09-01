@@ -140,7 +140,7 @@ export function Home() {
                   <span className="text-2xl font-black">2</span>
                 </div>
                 <h3 className="text-xl font-bold mb-3">Get Verified</h3>
-                <p className="text-muted-foreground leading-relaxed">Pay a small, one-time verification fee of Ksh 250 via Mpesa to unlock direct contacts.</p>
+                <p className="text-muted-foreground leading-relaxed">Pay a small, one-time verification fee of Ksh 100 via Mpesa to unlock direct contacts.</p>
               </div>
               
               <div className="text-center relative">
