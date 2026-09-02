@@ -276,6 +276,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /admin/revenue:
+    get:
+      operationId: getAdminRevenue
+      tags: [admin]
+      summary: Get verified payment revenue for admin
+      parameters:
+        - in: query
+          name: adminPin
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Revenue summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminRevenue"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /admin/approve/{userId}:
     post:
       operationId: adminApproveUser
@@ -551,6 +576,18 @@ components:
         adminPin:
           type: string
           minLength: 4
+
+    AdminRevenue:
+      type: object
+      required: [totalRevenue, approvedProfiles, verifiedPayments]
+      properties:
+        totalRevenue:
+          type: integer
+        approvedProfiles:
+          type: integer
+        verifiedPayments:
+          type: integer
+
 
     PlatformStats:
       type: object

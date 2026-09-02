@@ -51,6 +51,37 @@ router.get("/admin/dashboard", async (req, res): Promise<void> => {
   res.json(result);
 });
 
+// GET /admin/revenue — verified payment revenue summary
+router.get("/admin/revenue", async (req, res): Promise<void> => {
+  const adminPin = typeof req.query.adminPin === "string" ? req.query.adminPin : "";
+
+  if (!checkPin(adminPin)) {
+    res.status(401).json({ error: "Invalid admin PIN" });
+    return;
+  }
+
+  const verifiedPayments = await db
+    .select()
+    .from(paymentsTable)
+    .where(eq(paymentsTable.status, "verified"));
+
+  const approvedProfiles = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.paymentVerified, true));
+
+  const totalRevenue = verifiedPayments.reduce(
+    (total, payment) => total + (payment.amount ?? 0),
+    0,
+  );
+
+  res.json({
+    totalRevenue,
+    approvedProfiles: approvedProfiles.length,
+    verifiedPayments: verifiedPayments.length,
+  });
+});
+
 // POST /admin/approve/:userId
 router.post("/admin/approve/:userId", async (req, res): Promise<void> => {
   const rawId = Array.isArray(req.params.userId)

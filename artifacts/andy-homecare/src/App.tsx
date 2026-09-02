@@ -11,6 +11,7 @@ import { EditProfile } from '@/pages/profile/edit';
 import { Register } from '@/pages/auth/register';
 import { Payment } from '@/pages/payment';
 import { AdminPayments } from '@/pages/admin/payments';
+import RevenuePage from '@/pages/admin/revenue';
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/edit-profile/:id" component={EditProfile} />
       <Route path="/register" component={Register} />
       <Route path="/payment" component={Payment} />
+      <Route path="/admin/revenue" component={RevenuePage} />
       <Route path="/admin/payments" component={AdminPayments} />
       <Route component={NotFound} />
     </Switch>

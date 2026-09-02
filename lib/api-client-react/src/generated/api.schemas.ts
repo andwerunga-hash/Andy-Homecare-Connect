@@ -163,6 +163,12 @@ export interface AdminActionInput {
   adminPin: string;
 }
 
+export interface AdminRevenue {
+  totalRevenue: number;
+  approvedProfiles: number;
+  verifiedPayments: number;
+}
+
 export interface PlatformStats {
   totalHousekeepers: number;
   totalEmployers: number;
@@ -200,6 +206,10 @@ export const GetFeaturedUsersRole = {
 } as const;
 
 export type GetAdminDashboardParams = {
+adminPin: string;
+};
+
+export type GetAdminRevenueParams = {
 adminPin: string;
 };
 

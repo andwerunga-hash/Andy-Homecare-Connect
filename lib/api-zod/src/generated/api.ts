@@ -292,6 +292,20 @@ export const GetAdminDashboardResponse = zod.array(GetAdminDashboardResponseItem
 
 
 /**
+ * @summary Get verified payment revenue for admin
+ */
+export const GetAdminRevenueQueryParams = zod.object({
+  "adminPin": zod.coerce.string()
+})
+
+export const GetAdminRevenueResponse = zod.object({
+  "totalRevenue": zod.number(),
+  "approvedProfiles": zod.number(),
+  "verifiedPayments": zod.number()
+})
+
+
+/**
  * @summary Approve a user profile after verifying payment
  */
 export const AdminApproveUserParams = zod.object({

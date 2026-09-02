@@ -7,8 +7,10 @@
  */
 
 export * from './adminActionInput';
+export * from './adminRevenue';
 export * from './errorResponse';
 export * from './getAdminDashboardParams';
+export * from './getAdminRevenueParams';
 export * from './getFeaturedUsersParams';
 export * from './getFeaturedUsersRole';
 export * from './healthStatus';

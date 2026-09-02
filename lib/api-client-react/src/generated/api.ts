@@ -21,8 +21,10 @@ import type {
 
 import type {
   AdminActionInput,
+  AdminRevenue,
   ErrorResponse,
   GetAdminDashboardParams,
+  GetAdminRevenueParams,
   GetFeaturedUsersParams,
   HealthStatus,
   ListUsersParams,
@@ -901,6 +903,90 @@ export function useGetAdminDashboard<TData = Awaited<ReturnType<typeof getAdminD
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetAdminDashboardQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetAdminRevenueUrl = (params: GetAdminRevenueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/revenue?${stringifiedParams}` : `/api/admin/revenue`
+}
+
+/**
+ * @summary Get verified payment revenue for admin
+ */
+export const getAdminRevenue = async (params: GetAdminRevenueParams, options?: RequestInit): Promise<AdminRevenue> => {
+
+  return customFetch<AdminRevenue>(getGetAdminRevenueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminRevenueQueryKey = (params?: GetAdminRevenueParams,) => {
+    return [
+    `/api/admin/revenue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAdminRevenueQueryOptions = <TData = Awaited<ReturnType<typeof getAdminRevenue>>, TError = ErrorType<ErrorResponse>>(params: GetAdminRevenueParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminRevenue>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminRevenueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminRevenue>>> = ({ signal }) => getAdminRevenue(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminRevenue>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminRevenueQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminRevenue>>>
+export type GetAdminRevenueQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get verified payment revenue for admin
+ */
+
+export function useGetAdminRevenue<TData = Awaited<ReturnType<typeof getAdminRevenue>>, TError = ErrorType<ErrorResponse>>(
+ params: GetAdminRevenueParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminRevenue>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminRevenueQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
