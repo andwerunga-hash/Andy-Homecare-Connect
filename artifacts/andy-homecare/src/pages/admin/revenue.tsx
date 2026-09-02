@@ -5,43 +5,7 @@ import { Footer } from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function RevenuePage() {
-  const [adminPin, setAdminPin] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
-
-  if (!unlocked) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <main className="flex min-h-[70vh] items-center justify-center px-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md">
-            <h1 className="mb-2 text-2xl font-bold text-[#006600]">
-              Revenue Dashboard
-            </h1>
-            <p className="mb-6 text-gray-600">
-              Enter the administrator PIN to continue.
-            </p>
-            <Input
-              type="password"
-              inputMode="numeric"
-              value={adminPin}
-              onChange={(e) => setAdminPin(e.target.value)}
-              placeholder="Enter admin PIN"
-            />
-            <Button
-              className="mt-4 w-full bg-[#006600] hover:bg-[#005500]"
-              disabled={adminPin.length < 4}
-              onClick={() => setUnlocked(true)}
-            >
-              Unlock Revenue
-            </Button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
+function RevenueDashboard({ adminPin }: { adminPin: string }) {
   const { data, isLoading, error, refetch } = useGetAdminRevenue(
     { adminPin },
     {
@@ -125,6 +89,46 @@ export default function RevenuePage() {
             The registration fee is Ksh 100. Revenue is automatically updated
             when a payment is verified through profile approval.
           </p>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default function RevenuePage() {
+  const [adminPin, setAdminPin] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
+
+  if (unlocked) {
+    return <RevenueDashboard adminPin={adminPin} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="flex min-h-[70vh] items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md">
+          <h1 className="mb-2 text-2xl font-bold text-[#006600]">
+            Revenue Dashboard
+          </h1>
+          <p className="mb-6 text-gray-600">
+            Enter the administrator PIN to continue.
+          </p>
+          <Input
+            type="password"
+            inputMode="numeric"
+            value={adminPin}
+            onChange={(e) => setAdminPin(e.target.value)}
+            placeholder="Enter admin PIN"
+          />
+          <Button
+            className="mt-4 w-full bg-[#006600] hover:bg-[#005500]"
+            disabled={adminPin.length < 4}
+            onClick={() => setUnlocked(true)}
+          >
+            Unlock Revenue
+          </Button>
         </div>
       </main>
       <Footer />
