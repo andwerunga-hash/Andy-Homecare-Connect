@@ -29,7 +29,7 @@ function publicUser(user: typeof usersTable.$inferSelect) {
 
 router.post("/auth/register", async (req: Request, res: Response) => {
   try {
-    const { fullName, email, phone, password, role, county } = req.body ?? {};
+    const { fullName, email, phone, password, role, county, constituency, ward } = req.body ?? {};
 
     if (!fullName || !email || !phone || !password || !role || !county) {
       return res.status(400).json({
@@ -76,6 +76,8 @@ router.post("/auth/register", async (req: Request, res: Response) => {
         passwordHash,
         role,
         county: String(county).trim(),
+        constituency: constituency ? String(constituency).trim() : null,
+        ward: ward ? String(ward).trim() : null,
       })
       .returning();
 

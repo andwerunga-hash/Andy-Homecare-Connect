@@ -54,6 +54,10 @@ export const createUserBodyFullNameMin = 2;
 
 export const createUserBodyCountyMin = 2;
 
+export const createUserBodyConstituencyMin = 2;
+
+export const createUserBodyWardMin = 2;
+
 export const createUserBodyPhoneMin = 10;
 
 
@@ -63,6 +67,8 @@ export const CreateUserBody = zod.object({
   "fullName": zod.string().min(createUserBodyFullNameMin),
   "role": zod.enum(['employer', 'housekeeper']),
   "county": zod.string().min(createUserBodyCountyMin),
+  "constituency": zod.string().min(createUserBodyConstituencyMin),
+  "ward": zod.string().min(createUserBodyWardMin),
   "phone": zod.string().min(createUserBodyPhoneMin),
   "email": zod.string().optional(),
   "bio": zod.string().optional(),

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { KENYA_COUNTIES } from "@/lib/counties";
+import { CONSTITUENCIES } from "@/lib/constituencies";
+import { WARDS } from "@/lib/wards";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +23,8 @@ const formSchema = z.object({
   role: z.enum(["employer", "housekeeper"]),
   fullName: z.string().min(2, "Name must be at least 2 characters"),
   county: z.string().min(2, "Please select a county"),
+  constituency: z.string().min(2, "Please select a constituency"),
+  ward: z.string().min(2, "Please select a ward"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
   bio: z.string().max(500).optional(),
@@ -39,6 +43,10 @@ export function Register() {
   const createUser = useCreateUser();
   const [countyOpen, setCountyOpen] = useState(false);
   const [countySearch, setCountySearch] = useState("");
+  const [constituencyOpen, setConstituencyOpen] = useState(false);
+  const [constituencySearch, setConstituencySearch] = useState("");
+  const [wardOpen, setWardOpen] = useState(false);
+  const [wardSearch, setWardSearch] = useState("");
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -46,6 +54,8 @@ export function Register() {
       role: "housekeeper",
       fullName: "",
       county: "",
+      constituency: "",
+      ward: "",
       phone: "",
       email: "",
       bio: "",
@@ -60,6 +70,28 @@ export function Register() {
 
   const role = form.watch("role");
   const photoUrl = form.watch("photoUrl");
+  const selectedCounty = form.watch("county");
+  const selectedConstituency = form.watch("constituency");
+
+  const selectedConstituencies = selectedCounty
+    ? (CONSTITUENCIES[selectedCounty] ?? [])
+    : [];
+
+  const constituencyWardKey: Record<string, string> = {
+    "Chuka Igamba Ngombe": "CHUKA/IGAMBANG'OM",
+    "Ol Joro Orok": "OL JOROK",
+    "Soin Sigowet": "SIGOWET/SOIN",
+    "Suba North": "SUBA",
+    "Suba South": "SUBA",
+  };
+
+  const wardKey =
+    constituencyWardKey[selectedConstituency] ??
+    selectedConstituency?.toUpperCase();
+
+  const selectedWards = selectedConstituency
+    ? (WARDS[wardKey] ?? [])
+    : [];
 
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -254,6 +286,8 @@ export function Register() {
                                   type="button"
                                   onClick={() => {
                                     field.onChange(county);
+                                    form.setValue("constituency", "");
+                                    form.setValue("ward", "");
                                     setCountySearch("");
                                     setCountyOpen(false);
                                   }}
@@ -264,6 +298,145 @@ export function Register() {
                               ))}
                             {counties.filter((county) => county.toLowerCase().includes(countySearch.toLowerCase())).length === 0 && (
                               <p className="py-3 text-center text-sm text-muted-foreground">No county found.</p>
+                            )}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="constituency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Constituency</FormLabel>
+                      <Popover
+                        open={constituencyOpen}
+                        onOpenChange={(open) => {
+                          setConstituencyOpen(open);
+                          if (!open) setConstituencySearch("");
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              role="combobox"
+                              disabled={!selectedCounty}
+                              className="w-full justify-between bg-muted/30 font-normal"
+                            >
+                              {field.value || (selectedCounty ? "Select constituency" : "Select county first")}
+                              <span className="ml-2 opacity-50">⌄</span>
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                          <Input
+                            autoFocus
+                            value={constituencySearch}
+                            onChange={(e) => setConstituencySearch(e.target.value)}
+                            placeholder="Type constituency name..."
+                            className="mb-2 h-11 bg-white"
+                          />
+                          <div className="max-h-60 overflow-y-auto">
+                            {selectedConstituencies
+                              .filter((constituency) =>
+                                constituency.toLowerCase().includes(constituencySearch.toLowerCase())
+                              )
+                              .map((constituency) => (
+                                <button
+                                  key={constituency}
+                                  type="button"
+                                  onClick={() => {
+                                    field.onChange(constituency);
+                                    form.setValue("ward", "");
+                                    setConstituencySearch("");
+                                    setConstituencyOpen(false);
+                                  }}
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
+                                >
+                                  {constituency}
+                                </button>
+                              ))}
+                            {selectedConstituencies.filter((constituency) =>
+                              constituency.toLowerCase().includes(constituencySearch.toLowerCase())
+                            ).length === 0 && (
+                              <p className="py-3 text-center text-sm text-muted-foreground">
+                                No constituency found.
+                              </p>
+                            )}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ward"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ward</FormLabel>
+                      <Popover
+                        open={wardOpen}
+                        onOpenChange={(open) => {
+                          setWardOpen(open);
+                          if (!open) setWardSearch("");
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              role="combobox"
+                              disabled={!selectedConstituency}
+                              className="w-full justify-between bg-muted/30 font-normal"
+                            >
+                              {field.value || (selectedConstituency ? "Select ward" : "Select constituency first")}
+                              <span className="ml-2 opacity-50">⌄</span>
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                          <Input
+                            autoFocus
+                            value={wardSearch}
+                            onChange={(e) => setWardSearch(e.target.value)}
+                            placeholder="Type ward name..."
+                            className="mb-2 h-11 bg-white"
+                          />
+                          <div className="max-h-60 overflow-y-auto">
+                            {selectedWards
+                              .filter((ward) =>
+                                ward.toLowerCase().includes(wardSearch.toLowerCase())
+                              )
+                              .map((ward) => (
+                                <button
+                                  key={ward}
+                                  type="button"
+                                  onClick={() => {
+                                    field.onChange(ward);
+                                    setWardSearch("");
+                                    setWardOpen(false);
+                                  }}
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
+                                >
+                                  {ward}
+                                </button>
+                              ))}
+                            {selectedWards.filter((ward) =>
+                              ward.toLowerCase().includes(wardSearch.toLowerCase())
+                            ).length === 0 && (
+                              <p className="py-3 text-center text-sm text-muted-foreground">
+                                No ward found.
+                              </p>
                             )}
                           </div>
                         </PopoverContent>

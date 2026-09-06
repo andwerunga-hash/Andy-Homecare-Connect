@@ -477,7 +477,7 @@ components:
 
     UserInput:
       type: object
-      required: [fullName, role, county, phone, salaryExpectation]
+      required: [fullName, role, county, constituency, ward, phone, salaryExpectation]
       properties:
         fullName:
           type: string
@@ -486,6 +486,12 @@ components:
           type: string
           enum: [employer, housekeeper]
         county:
+          type: string
+          minLength: 2
+        constituency:
+          type: string
+          minLength: 2
+        ward:
           type: string
           minLength: 2
         phone:

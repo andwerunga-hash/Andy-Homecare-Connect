@@ -103,6 +103,10 @@ export interface UserInput {
   role: UserInputRole;
   /** @minLength 2 */
   county: string;
+  /** @minLength 2 */
+  constituency: string;
+  /** @minLength 2 */
+  ward: string;
   /** @minLength 10 */
   phone: string;
   email?: string;
