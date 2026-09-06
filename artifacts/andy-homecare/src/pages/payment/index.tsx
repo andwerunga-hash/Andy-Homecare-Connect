@@ -24,6 +24,7 @@ export function Payment() {
   
   const [isSuccess, setIsSuccess] = useState(false);
   const createPayment = useCreatePayment();
+  const requiredAmount = user?.role === "housekeeper" ? 100 : 500;
   const { data: user } = useGetUser(userId, { query: { queryKey: getGetUserQueryKey(userId), enabled: !!userId } });
   
   // Checking existing payment
@@ -44,7 +45,7 @@ export function Payment() {
         data: { 
           userId, 
           mpesaCode: values.mpesaCode.toUpperCase(), 
-          amount: 100 
+          amount: requiredAmount 
         } 
       },
       {
@@ -113,7 +114,7 @@ export function Payment() {
                 </div>
                 <h1 className="text-2xl font-extrabold mb-2">Verify Your Profile</h1>
                 <p className="text-muted-foreground">
-                  Complete a one-time payment of Ksh 100 to verify your identity and unlock direct contacts.
+                  Complete a one-time payment of Ksh {requiredAmount} to verify your identity and unlock direct contacts.
                 </p>
               </div>
 
@@ -138,7 +139,7 @@ export function Payment() {
                   </li>
                   <li className="flex gap-3">
                     <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0">5</span>
-                    <p>Enter Amount: <strong>Ksh 100</strong> and your PIN</p>
+                    <p>Enter Amount: <strong>Ksh {requiredAmount}</strong> and your PIN</p>
                   </li>
                 </ol>
               </div>

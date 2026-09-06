@@ -21,6 +21,19 @@ router.post("/payments", async (req, res): Promise<void> => {
     return;
   }
 
+  // Determine the correct registration fee from the user's role
+  const [user] = await db
+    .select({ role: usersTable.role })
+    .from(usersTable)
+    .where(eq(usersTable.id, parsed.data.userId));
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
+
+  const requiredAmount = user.role === "housekeeper" ? 100 : 500;
+
   // Check if user already has a payment
   const [existing] = await db
     .select()
@@ -37,7 +50,7 @@ router.post("/payments", async (req, res): Promise<void> => {
     .values({
       userId: parsed.data.userId,
       mpesaCode: parsed.data.mpesaCode,
-      amount: parsed.data.amount,
+      amount: requiredAmount,
       status: "pending",
     })
     .returning();

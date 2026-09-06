@@ -86,7 +86,7 @@ function RevenueDashboard({ adminPin }: { adminPin: string }) {
             Registration Revenue
           </h2>
           <p className="mt-2 text-gray-600">
-            The registration fee is Ksh 100. Revenue is automatically updated
+            Housekeeper registration is Ksh 100 and employer registration is Ksh 500. Revenue is automatically updated
             when a payment is verified through profile approval.
           </p>
         </div>
