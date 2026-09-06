@@ -8,11 +8,6 @@ import {
   AdminRejectUserParams,
   AdminRejectUserBody,
 } from "@workspace/api-zod";
-import {
-  notifyUserApproved,
-  notifyUserRejected,
-} from "../lib/whatsapp";
-
 const router: IRouter = Router();
 
 function checkPin(pin: string): boolean {
@@ -113,7 +108,6 @@ router.post("/admin/approve/:userId", async (req, res): Promise<void> => {
     .where(eq(paymentsTable.userId, params.data.userId));
 
   // Notify user via WhatsApp (fire & forget)
-  notifyUserApproved(user.phone, user.fullName).catch(() => {});
 
   res.json(user);
 });
@@ -149,7 +143,6 @@ router.post("/admin/reject/:userId", async (req, res): Promise<void> => {
     .where(eq(paymentsTable.userId, params.data.userId));
 
   // Notify user via WhatsApp (fire & forget)
-  notifyUserRejected(user.phone, user.fullName).catch(() => {});
 
   res.json(user);
 });

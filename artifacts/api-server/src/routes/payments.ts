@@ -5,7 +5,6 @@ import {
   CreatePaymentBody,
   GetUserPaymentParams,
 } from "@workspace/api-zod";
-import { notifyAdminPayment } from "../lib/whatsapp";
 
 const router: IRouter = Router();
 
@@ -55,23 +54,6 @@ router.post("/payments", async (req, res): Promise<void> => {
     })
     .returning();
 
-  // Notify admin via WhatsApp — look up user name for the message
-  const adminPhone = process.env.ADMIN_WHATSAPP_NUMBER;
-  if (adminPhone) {
-    const [user] = await db
-      .select({ fullName: usersTable.fullName })
-      .from(usersTable)
-      .where(eq(usersTable.id, parsed.data.userId));
-
-    if (user) {
-      notifyAdminPayment(
-        adminPhone,
-        user.fullName,
-        parsed.data.mpesaCode,
-        parsed.data.amount
-      ).catch(() => {});
-    }
-  }
 
   res.status(201).json(payment);
 });

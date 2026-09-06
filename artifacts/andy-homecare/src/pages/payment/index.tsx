@@ -24,8 +24,9 @@ export function Payment() {
   
   const [isSuccess, setIsSuccess] = useState(false);
   const createPayment = useCreatePayment();
-  const requiredAmount = user?.role === "housekeeper" ? 100 : 500;
   const { data: user } = useGetUser(userId, { query: { queryKey: getGetUserQueryKey(userId), enabled: !!userId } });
+  
+  const requiredAmount = user?.role === "housekeeper" ? 100 : 500;
   
   // Checking existing payment
   const { data: existingPayment, isLoading: isPaymentLoading } = useGetUserPayment(userId, { 
