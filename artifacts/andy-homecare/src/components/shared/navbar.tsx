@@ -36,6 +36,11 @@ export function Navbar() {
             </Link>
           ))}
           <div className="w-px h-5 bg-border mx-2"></div>
+          <Link href="/login">
+            <Button variant="outline" className="rounded-full px-6">
+              Member Login
+            </Button>
+          </Link>
           <Link href="/register">
             <Button variant="default" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6">
               Join Community
@@ -67,7 +72,12 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <div className="pt-2">
+          <div className="pt-2 space-y-2">
+            <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button variant="outline" className="w-full rounded-full">
+                Member Login
+              </Button>
+            </Link>
             <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
               <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-full">
                 Join Community

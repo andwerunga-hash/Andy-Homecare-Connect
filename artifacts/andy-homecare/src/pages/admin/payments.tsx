@@ -149,6 +149,44 @@ function Dashboard({ adminPin }: { adminPin: string }) {
     reject.mutate({ userId, data: { adminPin } });
   }
 
+  async function handleDelete(userId: number, fullName: string) {
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete ${fullName}? This will also remove their payment record.`
+    );
+
+    if (!confirmed) return;
+
+    setActionMsg(`Deleting ${fullName}…`);
+
+    try {
+      const response = await fetch(`/api/admin/user/${userId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ adminPin }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Unable to delete member.");
+      }
+
+      setActionMsg(`Member has been permanently deleted.`);
+
+      queryClient.invalidateQueries({
+        queryKey: getGetAdminDashboardQueryKey({ adminPin }),
+      });
+      setTimeout(() => setActionMsg(null), 4000);
+    } catch (error) {
+      setActionMsg(
+        `❌ ${error instanceof Error ? error.message : "Unable to delete member."}`
+      );
+      setTimeout(() => setActionMsg(null), 5000);
+    }
+  }
+
   // Stats
   const total = users.length;
   const pending = users.filter((u) => u.paymentStatus === "pending").length;
@@ -356,6 +394,16 @@ function Dashboard({ adminPin }: { adminPin: string }) {
                       </Button>
                     </div>
                   )}
+                  <div className="flex-shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDelete(user.id, user.fullName)}
+                      className="border-red-400 text-red-600 hover:bg-red-50 hover:text-red-700 font-semibold"
+                    >
+                      🗑 Delete
+                    </Button>
+                  </div>
                 </div>
               );
             })}

@@ -112,6 +112,46 @@ router.post("/admin/approve/:userId", async (req, res): Promise<void> => {
   res.json(user);
 });
 
+// DELETE /admin/user/:userId
+router.delete("/admin/user/:userId", async (req, res): Promise<void> => {
+  const rawId = Array.isArray(req.params.userId)
+    ? req.params.userId[0]
+    : req.params.userId;
+  const userId = parseInt(rawId, 10);
+  const adminPin = typeof req.body?.adminPin === "string" ? req.body.adminPin : "";
+
+  if (Number.isNaN(userId) || !checkPin(adminPin)) {
+    res.status(401).json({ error: "Invalid admin PIN" });
+    return;
+  }
+
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
+
+  if (user.role !== "housekeeper" && user.role !== "employer") {
+    res.status(403).json({ error: "This account cannot be deleted here" });
+    return;
+  }
+
+  await db
+    .delete(paymentsTable)
+    .where(eq(paymentsTable.userId, userId));
+
+  const deletedUsers = await db
+    .delete(usersTable)
+    .where(eq(usersTable.id, userId))
+    .returning({ id: usersTable.id });
+
+  res.json({ success: deletedUsers.length > 0, deletedUserId: userId });
+});
+
 // POST /admin/reject/:userId
 router.post("/admin/reject/:userId", async (req, res): Promise<void> => {
   const rawId = Array.isArray(req.params.userId)

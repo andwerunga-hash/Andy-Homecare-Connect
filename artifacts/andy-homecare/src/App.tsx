@@ -9,9 +9,9 @@ import { Browse } from '@/pages/browse';
 import { ProfileDetail } from '@/pages/profile';
 import { EditProfile } from '@/pages/profile/edit';
 import { Register } from '@/pages/auth/register';
+import { Login } from '@/pages/auth/login';
 import { Payment } from '@/pages/payment';
 import { AdminPayments } from '@/pages/admin/payments';
-import RevenuePage from '@/pages/admin/revenue';
 
 const queryClient = new QueryClient();
 
@@ -23,8 +23,8 @@ function Router() {
       <Route path="/profile/:id" component={ProfileDetail} />
       <Route path="/edit-profile/:id" component={EditProfile} />
       <Route path="/register" component={Register} />
+      <Route path="/login" component={Login} />
       <Route path="/payment" component={Payment} />
-      <Route path="/admin/revenue" component={RevenuePage} />
       <Route path="/admin/payments" component={AdminPayments} />
       <Route component={NotFound} />
     </Switch>
