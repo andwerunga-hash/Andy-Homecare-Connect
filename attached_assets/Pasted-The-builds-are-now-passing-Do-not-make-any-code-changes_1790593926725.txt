@@ -1,0 +1,78 @@
+The builds are now passing. Do not make any code changes.
+
+Please perform functional testing of the registration and payment flow using the current preview.
+
+Test these scenarios:
+
+### Test 1 — Househelp registration
+
+1. Open the registration page.
+2. Select Househelp.
+3. Complete the registration details, including County → Constituency → Ward.
+4. Submit registration.
+5. Confirm the user is created with:
+
+   * accountStatus = pending
+   * paymentVerified = false
+6. Confirm the user is redirected to the payment page.
+7. Confirm the required amount is Ksh 100.
+8. Confirm the pending registration user ID is stored for resume.
+9. Simulate the user leaving the website/payment page and returning.
+10. Confirm they can resume the payment process without starting registration again.
+
+### Test 2 — Employer registration
+
+Repeat the same test using Employer and confirm the required amount is Ksh 500.
+
+### Test 3 — M-PESA code submission
+
+Using the existing payment flow, submit a test transaction code and confirm:
+
+* the code is accepted according to the existing validation;
+* the payment remains pending until Admin approval;
+* no duplicate payment record is unexpectedly created when the user resumes.
+
+Do not claim that Safaricom/M-PESA has actually verified a transaction unless the existing system has a real M-PESA verification integration. We are only testing the application's existing transaction-code submission flow.
+
+### Test 4 — Admin approval
+
+Using the existing Admin approval process, verify a test user's payment.
+
+Confirm that approval results in all three states being updated correctly:
+
+* users.paymentVerified = true
+* users.accountStatus = active
+* payments.status = verified
+
+Confirm this happens through the existing Admin PIN-protected approval endpoint.
+
+### Test 5 — Return after approval
+
+After approval, return to/reload the payment page and registration page.
+
+Confirm:
+
+* the user is no longer treated as an unpaid pending registration;
+* the account remains active;
+* the resume pointer is cleared appropriately after verified payment.
+
+### Test 6 — Admin protection
+
+Confirm that Admin Login/Admin PIN and the existing Admin Dashboard still work.
+
+### Test 7 — County hierarchy
+
+Confirm that:
+County → Constituency → Ward
+
+still works correctly after the counties.ts correction.
+
+IMPORTANT:
+
+* Do not modify any files.
+* Do not alter database schema.
+* Do not create test code that remains in the project.
+* Do not change Admin Login, payment logic, authentication, or registration logic.
+* If a test cannot be performed because the preview lacks a required capability, report that clearly instead of modifying the application.
+
+At the end, give me a PASS/FAIL result for each test and explain any failure.
