@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { KENYA_COUNTIES } from "@/lib/counties";
 import { CONSTITUENCIES } from "@/lib/constituencies";
 import { WARDS } from "@/lib/wards";
@@ -6,7 +6,11 @@ import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useCreateUser } from "@workspace/api-client-react";
+import {
+  getGetUserQueryKey,
+  useCreateUser,
+  useGetUser,
+} from "@workspace/api-client-react";
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
@@ -38,9 +42,27 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const PENDING_REGISTRATION_KEY = "andy_pending_registration_user_id";
+
 export function Register() {
   const [, setLocation] = useLocation();
   const createUser = useCreateUser();
+  const [pendingUserId, setPendingUserId] = useState<number | null>(() => {
+    const storedId = Number(
+      window.localStorage.getItem(PENDING_REGISTRATION_KEY) ?? "",
+    );
+    return Number.isInteger(storedId) && storedId > 0 ? storedId : null;
+  });
+  const { data: pendingUser, isError: pendingUserNotFound } = useGetUser(
+    pendingUserId ?? 0,
+    {
+      query: {
+        queryKey: getGetUserQueryKey(pendingUserId ?? 0),
+        enabled: pendingUserId != null,
+        retry: false,
+      },
+    },
+  );
   const [countyOpen, setCountyOpen] = useState(false);
   const [countySearch, setCountySearch] = useState("");
   const [constituencyOpen, setConstituencyOpen] = useState(false);
@@ -72,6 +94,13 @@ export function Register() {
   const photoUrl = form.watch("photoUrl");
   const selectedCounty = form.watch("county");
   const selectedConstituency = form.watch("constituency");
+
+  useEffect(() => {
+    if (pendingUserNotFound) {
+      window.localStorage.removeItem(PENDING_REGISTRATION_KEY);
+      setPendingUserId(null);
+    }
+  }, [pendingUserNotFound]);
 
   const selectedConstituencies = selectedCounty
     ? (CONSTITUENCIES[selectedCounty] ?? [])
@@ -159,6 +188,10 @@ export function Register() {
       { data: values },
       {
         onSuccess: (user) => {
+          window.localStorage.setItem(
+            PENDING_REGISTRATION_KEY,
+            String(user.id),
+          );
           setLocation(`/payment?userId=${user.id}`);
         },
       }
@@ -177,6 +210,28 @@ export function Register() {
             <h1 className="text-3xl font-extrabold mb-2">Join the Community</h1>
             <p className="text-muted-foreground text-lg">Create your profile to connect with trusted families and house helps across Kenya.</p>
           </div>
+
+          {pendingUser && !pendingUser.paymentVerified && (
+            <Alert className="mb-8">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Registration in progress</AlertTitle>
+              <AlertDescription className="flex flex-col items-start gap-3">
+                <span>
+                  Your details are saved. Continue to the payment step without
+                  starting again.
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    setLocation(`/payment?userId=${pendingUser.id}`)
+                  }
+                >
+                  Resume payment
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

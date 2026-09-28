@@ -18,7 +18,14 @@ router.get("/users/featured", async (req, res): Promise<void> => {
 
   let query = db.select().from(usersTable).$dynamic();
   if (role) {
-    query = query.where(eq(usersTable.role, role));
+    query = query.where(
+      and(
+        eq(usersTable.accountStatus, "active"),
+        eq(usersTable.role, role),
+      ),
+    );
+  } else {
+    query = query.where(eq(usersTable.accountStatus, "active"));
   }
 
   const users = await query.limit(6).orderBy(usersTable.registeredAt);
@@ -34,7 +41,7 @@ router.get("/users", async (req, res): Promise<void> => {
 
   const { role, county, minSalary, maxSalary, skill } = parsed.data;
 
-  const conditions = [];
+  const conditions = [eq(usersTable.accountStatus, "active")];
   if (role) conditions.push(eq(usersTable.role, role));
   if (county) conditions.push(eq(usersTable.county, county));
   if (minSalary != null) conditions.push(gte(usersTable.salaryExpectation, minSalary));
@@ -77,6 +84,7 @@ router.post("/users", async (req, res): Promise<void> => {
       experience: parsed.data.experience ?? null,
       languages: parsed.data.languages ?? null,
       availability: parsed.data.availability ?? null,
+      accountStatus: "pending",
       paymentVerified: false,
     })
     .returning();

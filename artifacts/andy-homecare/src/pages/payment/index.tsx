@@ -13,6 +13,8 @@ import { Loader2, CheckCircle2, ShieldCheck, Info, Clock } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 
+const PENDING_REGISTRATION_KEY = "andy_pending_registration_user_id";
+
 const formSchema = z.object({
   mpesaCode: z.string().min(5, "Mpesa code is too short").regex(/^[A-Z0-9]+$/, "Invalid Mpesa code format"),
 });
@@ -20,7 +22,12 @@ const formSchema = z.object({
 export function Payment() {
   const [location] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
-  const userId = parseInt(searchParams.get("userId") || "0", 10);
+  const queryUserId = parseInt(searchParams.get("userId") || "0", 10);
+  const storedUserId = parseInt(
+    window.localStorage.getItem(PENDING_REGISTRATION_KEY) || "0",
+    10,
+  );
+  const userId = queryUserId || storedUserId;
   
   const [isSuccess, setIsSuccess] = useState(false);
   const createPayment = useCreatePayment();
@@ -32,6 +39,12 @@ export function Payment() {
   const { data: existingPayment, isLoading: isPaymentLoading } = useGetUserPayment(userId, { 
     query: { queryKey: getGetUserPaymentQueryKey(userId), enabled: !!userId && !isSuccess, retry: false } 
   });
+
+  useEffect(() => {
+    if (existingPayment?.status === "verified") {
+      window.localStorage.removeItem(PENDING_REGISTRATION_KEY);
+    }
+  }, [existingPayment?.status]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
