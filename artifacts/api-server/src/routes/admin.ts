@@ -92,7 +92,7 @@ router.post("/admin/approve/:userId", async (req, res): Promise<void> => {
 
   const [user] = await db
     .update(usersTable)
-    .set({ paymentVerified: true })
+    .set({ paymentVerified: true, accountStatus: "active" })
     .where(eq(usersTable.id, params.data.userId))
     .returning();
 

@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db, paymentsTable, usersTable } from "@workspace/db";
 import {
   CreatePaymentBody,
@@ -74,18 +74,6 @@ router.get("/payments/:userId", async (req, res): Promise<void> => {
   if (!payment) {
     res.status(404).json({ error: "No payment found for this user" });
     return;
-  }
-
-  if (payment.status === "verified") {
-    await db
-      .update(usersTable)
-      .set({ accountStatus: "active" })
-      .where(
-        and(
-          eq(usersTable.id, params.data.userId),
-          eq(usersTable.accountStatus, "pending"),
-        ),
-      );
   }
 
   res.json(payment);

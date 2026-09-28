@@ -1,0 +1,47 @@
+The inspection is satisfactory. You may now make a targeted correction to the registration/payment implementation, but do NOT redesign the application or touch unrelated files.
+
+Please make these changes:
+
+1. In the existing `POST /api/admin/approve/:userId` approval flow, when Admin approval succeeds, update the user's account state at the same time:
+
+   * `paymentVerified = true`
+   * `accountStatus = "active"`
+   * payment `status = "verified"`
+
+   These changes should happen together as part of the existing approval operation.
+
+2. Remove the need for `GET /api/payments/:userId` to activate a user. A GET/status endpoint should not be responsible for changing account state. It should simply return the existing payment status.
+
+3. Preserve the existing Admin PIN validation and approval authorization exactly as they currently work.
+
+4. Preserve the existing M-PESA transaction-code submission and payment verification workflow. Do not introduce direct Safaricom API verification or change the existing Admin verification process.
+
+5. Keep the current same-device localStorage resume mechanism. It is useful and should remain.
+
+6. Improve the user experience so that after returning from M-PESA, the user can resume the payment/registration process without starting over.
+
+7. Do NOT implement cross-device recovery yet unless it can be done securely using the existing authentication/user identity system without exposing one user's pending registration to another user. If it requires a larger architectural change, leave it out and report that separately.
+
+8. Do NOT attempt to solve duplicate registrations in this change unless there is already an existing safe mechanism in the current code. Do not add database migrations or restructure the users table.
+
+9. Do NOT modify:
+
+   * `artifacts/andy-homecare/src/lib/counties.ts`
+   * County → Constituency → Ward logic
+   * Admin Login
+   * Admin PIN authentication
+   * Admin Dashboard UI
+   * `artifacts/api-server/src/routes/auth.ts`
+   * registration fees
+   * unrelated application features
+
+10. After making the changes, run API checks and the frontend checks where possible. The known duplicate `KENYA_COUNTIES` declaration in `counties.ts` remains an existing unrelated issue and must NOT be fixed as part of this task.
+
+11. Before making any additional changes beyond the above, stop and report them to me.
+
+Finally, provide:
+
+* exact files changed;
+* concise explanation of each change;
+* relevant diff;
+* confirmation that Admin Login/Admin PIN and County → Constituency → Ward were not modified.
