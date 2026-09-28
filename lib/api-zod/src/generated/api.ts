@@ -216,7 +216,7 @@ export const ListPaymentsResponse = zod.array(ListPaymentsResponseItem)
  */
 export const createPaymentBodyMpesaCodeMin = 5;
 
-export const createPaymentBodyAmountMin = 250;
+export const createPaymentBodyAmountMin = 100;
 
 
 

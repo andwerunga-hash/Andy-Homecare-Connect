@@ -10,6 +10,6 @@ export interface PaymentInput {
   userId: number;
   /** @minLength 5 */
   mpesaCode: string;
-  /** @minimum 250 */
+  /** @minimum 100 */
   amount: number;
 }

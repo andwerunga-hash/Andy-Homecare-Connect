@@ -573,7 +573,7 @@ components:
           minLength: 5
         amount:
           type: integer
-          minimum: 250
+          minimum: 100
 
     AdminActionInput:
       type: object

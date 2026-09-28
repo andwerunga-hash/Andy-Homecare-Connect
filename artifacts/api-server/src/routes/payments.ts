@@ -33,6 +33,13 @@ router.post("/payments", async (req, res): Promise<void> => {
 
   const requiredAmount = user.role === "housekeeper" ? 100 : 500;
 
+  if (parsed.data.amount !== requiredAmount) {
+    res.status(400).json({
+      error: `Payment amount must be Ksh ${requiredAmount} for this account role`,
+    });
+    return;
+  }
+
   // Check if user already has a payment
   const [existing] = await db
     .select()

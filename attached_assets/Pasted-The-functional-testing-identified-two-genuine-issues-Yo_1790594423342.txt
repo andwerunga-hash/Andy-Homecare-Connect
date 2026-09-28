@@ -1,0 +1,78 @@
+The functional testing identified two genuine issues. You may fix ONLY these two issues. Do not make any other changes.
+
+### ISSUE 1 — Househelp Ksh 100 payment rejected
+
+The frontend correctly uses:
+
+* Househelp: Ksh 100
+* Employer: Ksh 500
+
+The server also calculates the role-based amount correctly, but the shared `CreatePaymentBody` validation currently requires the submitted amount to be at least Ksh 250.
+
+Fix this inconsistency so that a legitimate Househelp payment of Ksh 100 is accepted.
+
+IMPORTANT:
+
+* Do NOT change the Househelp fee from Ksh 100.
+* Do NOT change the Employer fee from Ksh 500.
+* Do NOT weaken validation unnecessarily.
+* The server must continue deriving the expected amount from the user's role.
+* The submitted amount should still be validated against the expected role-based amount.
+* Inspect the existing schema and payment route and make the smallest safe correction.
+
+### ISSUE 2 — Constituency and Ward are not persisted
+
+The registration UI correctly collects:
+
+* county
+* constituency
+* ward
+
+But functional testing showed that the registration API creates the user with:
+
+`constituency: null`
+`ward: null`
+
+Fix the registration API so the submitted constituency and ward values are actually persisted to the existing users table.
+
+IMPORTANT:
+
+* Do NOT change the County → Constituency → Ward frontend logic.
+* Do NOT modify `counties.ts`, `constituencies.ts`, or `wards.ts`.
+* Do NOT change the database schema or create a migration unless you discover that the existing users table genuinely lacks these columns. First inspect the existing schema.
+* Do not change unrelated user fields.
+* Preserve the existing registration/payment flow.
+
+### Files/scope
+
+Before editing, inspect the relevant schema, payment validation schema/route, and user registration route.
+
+Make the smallest possible changes necessary.
+
+Do NOT modify:
+
+* Admin Login
+* Admin PIN
+* Admin Dashboard
+* authentication routes
+* payment approval logic
+* registration fees
+* county/constituency/ward data files
+* cross-device recovery
+* duplicate-registration handling
+
+After the changes:
+
+1. Run frontend typecheck.
+2. Run frontend production build with `BASE_PATH=/`.
+3. Run API typecheck.
+4. Run API production build.
+5. Run `git diff --check`.
+6. Test Househelp payment submission with Ksh 100.
+7. Test Employer payment submission with Ksh 500.
+8. Test a registration containing County + Constituency + Ward and confirm all three are persisted.
+9. Confirm duplicate payment protection still works.
+
+Do not access or use the Admin PIN.
+
+Report the exact files changed and the test results. Stop after these changes.

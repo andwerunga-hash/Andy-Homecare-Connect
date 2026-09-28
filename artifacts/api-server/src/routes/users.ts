@@ -75,6 +75,8 @@ router.post("/users", async (req, res): Promise<void> => {
       fullName: parsed.data.fullName,
       role: parsed.data.role,
       county: parsed.data.county,
+      constituency: parsed.data.constituency,
+      ward: parsed.data.ward,
       phone: parsed.data.phone,
       email: parsed.data.email?.trim() || null,
       bio: parsed.data.bio ?? null,
